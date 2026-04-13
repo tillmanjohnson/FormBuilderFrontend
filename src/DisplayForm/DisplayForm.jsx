@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-
+import { useParams } from "react-router-dom";
 function DisplayForm() {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Set the form ID you want to display
-  const formId = "form_Smiles_test3";
+  
+
+  const { formId } = useParams();
+  //const formId = "form_smiles_intake";
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/built-forms")

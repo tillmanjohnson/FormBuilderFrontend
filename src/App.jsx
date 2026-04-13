@@ -95,6 +95,9 @@ function App() {
         <Route path="/display-form" element={<DisplayForm />} />
         <Route path="/form-builder" element={<FormBuilder />} />
 
+        {/* no log in form i hope */}
+        <Route path="/form/:formId" element={<DisplayForm />} />
+
         {/* INDIVIDUAL FORM DATA PAGE */}
         <Route
           path="/:orgName/:formId"
