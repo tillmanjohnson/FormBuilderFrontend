@@ -30,7 +30,7 @@ export default function FormDataPage({ setLoggedIn }) {
     rowModesModel[selectedRowId]?.mode === GridRowModes.Edit;
 
   function handleLogout() {
-    fetch("http://localhost:5000/logout", {
+    fetch("https://formbuilderbackend-d26n.onrender.com/logout", {
       method: "POST",
       credentials: "include",
     }).then(() => setLoggedIn(false));
@@ -71,7 +71,7 @@ export default function FormDataPage({ setLoggedIn }) {
   const processRowUpdate = async (updatedRow, originalRow) => {
     const { id, ...responseFields } = updatedRow;
     try {
-      const res = await fetch(`http://localhost:5000/form-submissions/${id}`, {
+      const res = await fetch(`https://formbuilderbackend-d26n.onrender.com/form-submissions/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -96,7 +96,7 @@ export default function FormDataPage({ setLoggedIn }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        const authRes = await fetch("http://localhost:5000/check-auth", {
+        const authRes = await fetch("https://formbuilderbackend-d26n.onrender.com/check-auth", {
           credentials: "include",
         });
         const authData = await authRes.json();
@@ -108,7 +108,7 @@ export default function FormDataPage({ setLoggedIn }) {
           return;
         }
 
-        const res = await fetch("http://localhost:5000/form-submissions", {
+        const res = await fetch("https://formbuilderbackend-d26n.onrender.com/form-submissions", {
           credentials: "include",
         });
         const data = await res.json();
@@ -138,7 +138,7 @@ export default function FormDataPage({ setLoggedIn }) {
         });
         setRows(generatedRows);
 
-        const formsRes = await fetch("http://localhost:5000/built-forms-list", {
+        const formsRes = await fetch("https://formbuilderbackend-d26n.onrender.com/built-forms-list", {
           credentials: "include",
         });
         const formsData = await formsRes.json();

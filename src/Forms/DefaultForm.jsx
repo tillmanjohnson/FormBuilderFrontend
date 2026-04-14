@@ -28,7 +28,7 @@ export default function FormComponent() {
       answers: answers
     };
 
-    const res = await fetch("http://127.0.0.1:5000/submit-form", {
+    const res = await fetch("https://formbuilderbackend-d26n.onrender.com/submit-form", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

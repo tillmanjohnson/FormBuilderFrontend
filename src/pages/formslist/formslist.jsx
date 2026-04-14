@@ -11,7 +11,7 @@ export default function FormsList({ setLoggedIn }) {
   const { orgName } = useParams();
 
   function handleLogout() {
-    fetch("http://localhost:5000/logout", {
+    fetch("https://formbuilderbackend-d26n.onrender.com/logout", {
       method: "POST",
       credentials: "include",
     }).then(() => setLoggedIn(false));
@@ -30,7 +30,7 @@ export default function FormsList({ setLoggedIn }) {
     async function fetchData() {
       try {
         // 🔐 Get real org from backend
-        const authRes = await fetch("http://localhost:5000/check-auth", {
+        const authRes = await fetch("https://formbuilderbackend-d26n.onrender.com/check-auth", {
           credentials: "include",
         });
 
@@ -45,7 +45,7 @@ export default function FormsList({ setLoggedIn }) {
         }
 
         // Fetch forms
-        const res = await fetch("http://localhost:5000/built-forms-list", {
+        const res = await fetch("https://formbuilderbackend-d26n.onrender.com/built-forms-list", {
           credentials: "include",
         });
 

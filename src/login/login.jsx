@@ -15,7 +15,7 @@ function LoginForm({ setAuthView, setLoggedIn, setUserOrg }) {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/login", {
+      const res = await fetch("https://formbuilderbackend-d26n.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // important for cookies

@@ -11,7 +11,7 @@ function DisplayForm() {
   //const formId = "form_smiles_intake";
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/built-forms")
+    fetch("https://formbuilderbackend-d26n.onrender.com/built-forms")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch forms");
         return res.json();
@@ -62,7 +62,7 @@ function DisplayForm() {
     console.log("Submitting:", submissionPayload);
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/submit-form", {
+      const res = await fetch("https://formbuilderbackend-d26n.onrender.com/submit-form", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

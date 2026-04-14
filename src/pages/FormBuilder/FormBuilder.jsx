@@ -57,7 +57,7 @@ function FormBuilder() {
     console.log("Form JSON:", payload);
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/built-forms", {
+      const res = await fetch("https://formbuilderbackend-d26n.onrender.com/built-forms", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
