@@ -58,7 +58,7 @@ function FormBuilder({ setLoggedIn }) {
     };
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/built-forms", {
+      const res = await fetch("https://formbuilderbackend-d26n.onrender.com/built-forms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -67,7 +67,7 @@ function FormBuilder({ setLoggedIn }) {
       if (!res.ok) throw new Error(await res.text());
 
       // Generate the URL based on your routing structure
-      // e.g., http://localhost:5173/display-form/form_Smiles_intake
+      // e.g., http://localhost:5173/form/form_Smiles_intake
       const generatedUrl = `${window.location.origin}/form/${formId}`;
       
       setPublishedUrl(generatedUrl);

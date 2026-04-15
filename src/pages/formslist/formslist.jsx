@@ -36,6 +36,13 @@ export default function FormsList({ setLoggedIn }) {
   const navigate = useNavigate();
   const { orgName } = useParams();
 
+  function handleLogout() {
+    fetch("https://formbuilderbackend-d26n.onrender.com/logout", {
+      method: "POST",
+      credentials: "include",
+    }).then(() => setLoggedIn(false));
+  }
+
   function handleCreateForm() {
     navigate(`/form-builder`);
   }
@@ -43,7 +50,8 @@ export default function FormsList({ setLoggedIn }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        const authRes = await fetch("http://localhost:5000/check-auth", {
+        // 🔐 Get real org from backend
+        const authRes = await fetch("https://formbuilderbackend-d26n.onrender.com/check-auth", {
           credentials: "include",
         });
 
@@ -56,7 +64,8 @@ export default function FormsList({ setLoggedIn }) {
           return;
         }
 
-        const res = await fetch("http://localhost:5000/built-forms-list", {
+        // Fetch forms
+        const res = await fetch("https://formbuilderbackend-d26n.onrender.com/built-forms-list", {
           credentials: "include",
         });
 

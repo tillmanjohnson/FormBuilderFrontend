@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch("http://localhost:5000/check-auth", {
+        const res = await fetch("https://formbuilderbackend-d26n.onrender.com/check-auth", {
           method: "GET",
           credentials: "include",
         });

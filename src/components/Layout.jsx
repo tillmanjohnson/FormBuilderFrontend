@@ -5,7 +5,7 @@ export default function Layout({ children, userOrg, setLoggedIn }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    fetch("http://localhost:5000/logout", {
+    fetch("https://formbuilderbackend-d26n.onrender.com/logout", {
       method: "POST",
       credentials: "include",
     }).then(() => setLoggedIn(false));
