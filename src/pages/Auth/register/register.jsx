@@ -78,7 +78,11 @@ export default function RegisterForm({ setAuthView }) {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ email, password, organization }),
+        body: JSON.stringify({
+          email: email.toLowerCase(), 
+          password,
+          organization: organization.toLowerCase()
+        }),
       });
 
       const data = await res.json();
