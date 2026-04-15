@@ -1,11 +1,1 @@
-html, body, #root {
-  height: 100%;
-  margin: 0 auto;
-  padding: 0;
-  text-align: center;
-}
-
-/* Optional: nicer default font */
-body {
-  font-family: Roboto, Arial, sans-serif;
-}
+/* Don't need anything in here rn, Apr 14th */
