@@ -5,7 +5,7 @@ export default function Layout({ children, userOrg, setLoggedIn }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    fetch("https://formbuilderbackend-d26n.onrender.com/logout", {
+    fetch(`${import.meta.env.VITE_API_URL}/logout`, {
       method: "POST",
       credentials: "include",
     }).then(() => setLoggedIn(false));

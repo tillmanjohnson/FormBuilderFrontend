@@ -37,7 +37,7 @@ export default function FormDataPage({ setLoggedIn }) {
     rowModesModel[selectedRowId]?.mode === GridRowModes.Edit;
 
   function handleLogout() {
-    fetch("https://formbuilderbackend-d26n.onrender.com/logout", {
+    fetch(`${import.meta.env.VITE_API_URL}/logout`, {
       method: "POST",
       credentials: "include",
     }).then(() => setLoggedIn(false));
@@ -78,7 +78,7 @@ export default function FormDataPage({ setLoggedIn }) {
   const processRowUpdate = async (updatedRow, originalRow) => {
     const { id, ...responseFields } = updatedRow;
     try {
-      const res = await fetch(`https://formbuilderbackend-d26n.onrender.com/form-submissions/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/form-submissions/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -109,7 +109,7 @@ export default function FormDataPage({ setLoggedIn }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        const authRes = await fetch("https://formbuilderbackend-d26n.onrender.com/check-auth", {
+        const authRes = await fetch(`${import.meta.env.VITE_API_URL}/check-auth`, {
           credentials: "include",
         });
         const authData = await authRes.json();
@@ -121,7 +121,7 @@ export default function FormDataPage({ setLoggedIn }) {
           return;
         }
 
-        const res = await fetch("https://formbuilderbackend-d26n.onrender.com/form-submissions", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/form-submissions`, {
           credentials: "include",
         });
         const data = await res.json();
@@ -152,7 +152,7 @@ export default function FormDataPage({ setLoggedIn }) {
         });
         setRows(generatedRows);
 
-        const formsRes = await fetch("https://formbuilderbackend-d26n.onrender.com/built-forms-list", {
+        const formsRes = await fetch(`${import.meta.env.VITE_API_URL}/built-forms-list`, {
           credentials: "include",
         });
         const formsData = await formsRes.json();

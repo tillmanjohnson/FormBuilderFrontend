@@ -72,7 +72,7 @@ export default function RegisterForm({ setAuthView }) {
     }
 
     try {
-      const res = await fetch("https://formbuilderbackend-d26n.onrender.com/register", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,9 +81,8 @@ export default function RegisterForm({ setAuthView }) {
         body: JSON.stringify({
           email: email.toLowerCase(), 
           password,
-          organization: organization.toLowerCase()
-        }),
-      });
+          organization: organization.trim().toLowerCase(),
+        }),});
 
       const data = await res.json();
 

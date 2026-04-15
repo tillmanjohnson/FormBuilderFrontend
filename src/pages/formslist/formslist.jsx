@@ -37,7 +37,7 @@ export default function FormsList({ setLoggedIn }) {
   const { orgName } = useParams();
 
   function handleLogout() {
-    fetch("https://formbuilderbackend-d26n.onrender.com/logout", {
+    fetch(`${import.meta.env.VITE_API_URL}/logout`, {
       method: "POST",
       credentials: "include",
     }).then(() => setLoggedIn(false));
@@ -51,7 +51,7 @@ export default function FormsList({ setLoggedIn }) {
     async function fetchData() {
       try {
         // 🔐 Get real org from backend
-        const authRes = await fetch("https://formbuilderbackend-d26n.onrender.com/check-auth", {
+        const authRes = await fetch(`${import.meta.env.VITE_API_URL}/check-auth`, {
           credentials: "include",
         });
 

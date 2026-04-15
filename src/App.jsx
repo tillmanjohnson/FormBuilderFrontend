@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch("https://formbuilderbackend-d26n.onrender.com/check-auth", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/check-auth`, {
           method: "GET",
           credentials: "include",
         });
