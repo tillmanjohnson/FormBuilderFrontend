@@ -23,7 +23,7 @@ function DisplayForm() {
   const { formId } = useParams();
 
   useEffect(() => {
-    fetch("https://formbuilderbackend-d26n.onrender.com/built-forms")
+    fetch(`${import.meta.env.VITE_API_URL}/built-forms`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch forms");
         return res.json();
@@ -62,7 +62,7 @@ function DisplayForm() {
     };
 
     try {
-      const res = await fetch("https://formbuilderbackend-d26n.onrender.com/submit-form", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/submit-form`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(submissionPayload),

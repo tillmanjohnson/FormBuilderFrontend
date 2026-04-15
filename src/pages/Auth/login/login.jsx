@@ -60,7 +60,7 @@ export default function LoginForm({ setAuthView, setLoggedIn, setUserOrg }) {
 
     // Your original fetch logic
     try {
-      const res = await fetch("https://formbuilderbackend-d26n.onrender.com/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // important for cookies

@@ -58,7 +58,7 @@ function FormBuilder({ setLoggedIn }) {
     };
 
     try {
-      const res = await fetch("https://formbuilderbackend-d26n.onrender.com/built-forms", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/built-forms`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
