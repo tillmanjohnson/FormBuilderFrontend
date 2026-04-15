@@ -60,7 +60,7 @@ export default function LoginForm({ setAuthView, setLoggedIn, setUserOrg }) {
 
     // Your original fetch logic
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/check-auth`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // important for cookies

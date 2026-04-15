@@ -17,6 +17,8 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(null);
   const [userOrg, setUserOrg] = useState(null); // <- store user's organization
 
+  console.log("My API URL is:", import.meta.env.VITE_API_URL);
+
   // Check authentication and get organization
   useEffect(() => {
     async function checkAuth() {

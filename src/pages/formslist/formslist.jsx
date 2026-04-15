@@ -65,7 +65,7 @@ export default function FormsList({ setLoggedIn }) {
         }
 
         // Fetch forms
-        const res = await fetch("https://formbuilderbackend-d26n.onrender.com/built-forms-list", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/built-forms-list`, {
           credentials: "include",
         });
 
