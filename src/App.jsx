@@ -4,12 +4,12 @@ import { CircularProgress, Box, Container, Typography } from "@mui/material";
 
 import './App.css';
 
-import LoginForm from './login/login.jsx';
-import RegisterForm from './register/register.jsx';
+import LoginForm from './pages/Auth/login/login.jsx';
+import RegisterForm from './pages/Auth/register/register.jsx';
 import DefaultForm from "./Forms/DefaultForm.jsx";
 import DisplayForm from "./DisplayForm/DisplayForm.jsx";
-import FormsList from "./pages/formslist/formslist.jsx";
-import FormDataPage from "./pages/formdatapage/formdatapage.jsx";
+import FormsList from "./pages/FormsList/FormsList.jsx";
+import FormDataPage from "./pages/FormDataPage/FormDataPage.jsx";
 import FormBuilder from "./pages/FormBuilder/FormBuilder.jsx";
 
 function App() {
@@ -60,24 +60,15 @@ function App() {
             loggedIn && userOrg ? (
               <Navigate to={`/${userOrg}`} />
             ) : (
-              <Container maxWidth="sm">
-                <Box mt={8} textAlign="center">
-                  <Typography variant="h4" gutterBottom>
-                    Intake Form MVP
-                  </Typography>
-
-                  {authView === "login" ? (
-                    <LoginForm
-                      setAuthView={setAuthView}
-                      setLoggedIn={setLoggedIn}
-                      setUserOrg={setUserOrg} // <- pass setter to LoginForm
-                    />
-                  ) : (
-                    <RegisterForm setAuthView={setAuthView} />
-                  )}
-
-                </Box>
-              </Container>
+              authView === "login" ? (
+                <LoginForm
+                  setAuthView={setAuthView}
+                  setLoggedIn={setLoggedIn}
+                  setUserOrg={setUserOrg}
+                />
+              ) : (
+                <RegisterForm setAuthView={setAuthView} />
+              )
             )
           }
         />
