@@ -178,7 +178,11 @@ function FormBuilder({ setLoggedIn }) {
                     </Tooltip>
                   </InputAdornment>
                 ),
-                sx: { borderRadius: '12px', bgcolor: '#f9f9f9' }
+                sx: {
+                  borderRadius: '12px',
+                  bgcolor: 'action.hover',
+                  color: 'text.secondary',
+                }
               }}
             />
           </DialogContent>
