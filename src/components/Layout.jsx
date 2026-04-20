@@ -8,7 +8,10 @@ export default function Layout({ children, userOrg, setLoggedIn }) {
     fetch(`${import.meta.env.VITE_API_URL}/logout`, {
       method: "POST",
       credentials: "include",
-    }).then(() => setLoggedIn(false));
+    }).then(() => {
+      localStorage.removeItem("token"); 
+      setLoggedIn(false);
+    });
   };
 
   return (

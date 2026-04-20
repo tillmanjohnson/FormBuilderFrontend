@@ -26,6 +26,9 @@ function App() {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/check-auth`, {
           method: "GET",
           credentials: "include",
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}` 
+          },
         });
 
         if (res.ok) {

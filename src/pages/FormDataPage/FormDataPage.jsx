@@ -81,7 +81,10 @@ export default function FormDataPage({ setLoggedIn }) {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/form-submissions/${id}`, {
         method: "PUT",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }, 
         body: JSON.stringify({ formId, responses: responseFields }),
       });
       if (!res.ok) {
@@ -111,6 +114,7 @@ export default function FormDataPage({ setLoggedIn }) {
       try {
         const authRes = await fetch(`${import.meta.env.VITE_API_URL}/check-auth`, {
           credentials: "include",
+          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
         });
         const authData = await authRes.json();
         const realOrg = authData.organization;
@@ -123,6 +127,7 @@ export default function FormDataPage({ setLoggedIn }) {
 
         const res = await fetch(`${import.meta.env.VITE_API_URL}/form-submissions`, {
           credentials: "include",
+          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
         });
         const data = await res.json();
         const filtered = data.filter((f) => f.formId === formId);
@@ -154,6 +159,7 @@ export default function FormDataPage({ setLoggedIn }) {
 
         const formsRes = await fetch(`${import.meta.env.VITE_API_URL}/built-forms-list`, {
           credentials: "include",
+          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
         });
         const formsData = await formsRes.json();
         const match = formsData.find((f) => f.id === formId);

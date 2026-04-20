@@ -53,6 +53,7 @@ export default function FormsList({ setLoggedIn }) {
         // 🔐 Get real org from backend
         const authRes = await fetch(`${import.meta.env.VITE_API_URL}/check-auth`, {
           credentials: "include",
+          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
         });
 
         const authData = await authRes.json();
@@ -67,6 +68,7 @@ export default function FormsList({ setLoggedIn }) {
         // Fetch forms
         const res = await fetch(`${import.meta.env.VITE_API_URL}/built-forms-list`, {
           credentials: "include",
+          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
         });
 
         const data = await res.json();

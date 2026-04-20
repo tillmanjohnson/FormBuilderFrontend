@@ -76,6 +76,10 @@ export default function LoginForm({ setAuthView, setLoggedIn, setUserOrg }) {
 
       console.log("Login success:", data);
 
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+      }
+
       // Update App state for redirect
       setUserOrg(data.organization);
       setLoggedIn(true);
