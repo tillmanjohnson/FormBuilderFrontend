@@ -5,13 +5,19 @@ import {
   GridRowModes,
   GridRowEditStopReasons,
 } from "@mui/x-data-grid";
-import { Typography, Box, Button, IconButton, Tooltip } from "@mui/material";
+import { 
+  Typography, Box, Button, IconButton, Tooltip,
+  Paper, Dialog, DialogTitle, DialogContent, DialogActions // <-- NEW IMPORTS
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
+import QrCodeIcon from '@mui/icons-material/QrCode'; // <-- NEW IMPORT
+import DownloadIcon from '@mui/icons-material/Download'; // <-- NEW IMPORT
+import { QRCodeCanvas } from 'qrcode.react'; // <-- NEW IMPORT
 
 import Layout from "../../components/Layout";
 
@@ -31,6 +37,9 @@ export default function FormDataPage({ setLoggedIn }) {
   const [loading, setLoading] = useState(true);
   const [formUrl, setFormUrl] = useState("");
   const [copied, setCopied] = useState(false);
+  
+  // --- NEW STATE: Controls the QR Modal ---
+  const [qrDialogOpen, setQrDialogOpen] = useState(false);
 
   const isEditing =
     selectedRowId !== null &&
@@ -107,6 +116,20 @@ export default function FormDataPage({ setLoggedIn }) {
     navigator.clipboard.writeText(formUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000); // Swaps icon back after 2 seconds
+  };
+
+  // --- NEW FUNCTION: Download QR Code ---
+  const downloadQRCode = () => {
+    const canvas = document.getElementById("qr-code-canvas-data");
+    if (canvas) {
+      const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+      let downloadLink = document.createElement("a");
+      downloadLink.href = pngUrl;
+      downloadLink.download = `${title.toLowerCase().replace(/\s+/g, "_")}_QR.png`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
   };
 
   useEffect(() => {
@@ -320,36 +343,89 @@ export default function FormDataPage({ setLoggedIn }) {
           </Box>
 
           <Box 
-          sx={{ 
-            display: 'flex', 
-            justifyContent: 'flex-start', 
-            alignItems: 'center', 
-            mb: 4, 
-            mt: 1,
-            gap: 1 
-          }}
-        >
-          <Typography 
-            variant="body2" 
-            sx={(theme) => ({ 
-              color: 'text.secondary', 
-              bgcolor: theme.palette.action.hover, // Auto-adapts perfectly
-              px: 1.5, 
-              py: 0.5, 
-              borderRadius: '4px', 
-              border: `1px solid ${theme.palette.divider}`,
-              fontSize: '0.8rem'
-            })}
+            sx={{ 
+              display: 'flex', 
+              justifyContent: 'flex-start', 
+              alignItems: 'center', 
+              mb: 4, 
+              mt: 1,
+              gap: 1 
+            }}
           >
-            {formUrl}
-          </Typography>
-          <Tooltip title={copied ? "Copied!" : "Copy Link"}>
-            <IconButton size="small" onClick={handleCopyLink} color={copied ? "success" : "primary"}>
-              {copied ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
-            </IconButton>
-          </Tooltip>
+            <Typography 
+              variant="body2" 
+              sx={(theme) => ({ 
+                color: 'text.secondary', 
+                bgcolor: theme.palette.action.hover, // Auto-adapts perfectly
+                px: 1.5, 
+                py: 0.5, 
+                borderRadius: '4px', 
+                border: `1px solid ${theme.palette.divider}`,
+                fontSize: '0.8rem'
+              })}
+            >
+              {formUrl}
+            </Typography>
+            <Tooltip title={copied ? "Copied!" : "Copy Link"}>
+              <IconButton size="small" onClick={handleCopyLink} color={copied ? "success" : "primary"}>
+                {copied ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
+              </IconButton>
+            </Tooltip>
+            
+            {/* --- NEW: QR Code Trigger Button --- */}
+            {formUrl && (
+              <Tooltip title="View QR Code">
+                <IconButton size="small" onClick={() => setQrDialogOpen(true)} color="primary">
+                  <QrCodeIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
         </Box>
-        </Box>
+
+        {/* --- NEW: QR Code Modal --- */}
+        <Dialog 
+          open={qrDialogOpen} 
+          onClose={() => setQrDialogOpen(false)}
+          PaperProps={{ sx: { borderRadius: '24px', p: 2, textAlign: 'center', minWidth: '300px' } }}
+        >
+          <DialogTitle fontWeight="800">Form QR Code</DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2 }}>
+              <Paper 
+                elevation={0} 
+                sx={{ 
+                  p: 2, 
+                  border: '2px dashed', 
+                  borderColor: 'divider',
+                  borderRadius: '16px',
+                  display: 'inline-block'
+                }}
+              >
+                <QRCodeCanvas 
+                  id="qr-code-canvas-data" 
+                  value={formUrl || "https://"} 
+                  size={160} 
+                  level={"H"} 
+                  includeMargin={true}
+                />
+              </Paper>
+              <Button 
+                startIcon={<DownloadIcon />} 
+                onClick={downloadQRCode} 
+                variant="contained"
+                sx={{ mt: 3, textTransform: 'none', fontWeight: 600, borderRadius: '8px' }}
+              >
+                Download PNG
+              </Button>
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
+            <Button onClick={() => setQrDialogOpen(false)} color="inherit" sx={{ fontWeight: 600, textTransform: 'none' }}>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
 
       </Box>
     </Layout>
