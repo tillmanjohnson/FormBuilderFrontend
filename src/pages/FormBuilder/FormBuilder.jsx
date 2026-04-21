@@ -12,6 +12,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import DownloadIcon from '@mui/icons-material/Download';
+import { QRCodeCanvas } from 'qrcode.react'; // <-- NEW IMPORT
 import Layout from "../../components/Layout";
 
 function FormBuilder({ setLoggedIn }) {
@@ -23,7 +25,7 @@ function FormBuilder({ setLoggedIn }) {
   
   // Modal States
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [publishedUrl, setPublishedUrl] = useState(""); // Stores the URL after creation
+  const [publishedUrl, setPublishedUrl] = useState(""); 
 
   const addField = () => setFields([...fields, { id: "", label: "", type: "text", required: false }]);
 
@@ -45,7 +47,7 @@ function FormBuilder({ setLoggedIn }) {
   };
 
   const handleFinalSubmit = async () => {
-    const lowerOrg = organization.toLowerCase(); // Force lowercase
+    const lowerOrg = organization.toLowerCase(); 
     const formId = `form_${lowerOrg}_${title.toLowerCase().replace(/\s+/g, "_")}`;
     
     const payload = { 
@@ -86,7 +88,20 @@ function FormBuilder({ setLoggedIn }) {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(publishedUrl);
-    // You could add a small toast notification here if you wanted!
+  };
+
+  // --- NEW: Function to download the QR code as a PNG ---
+  const downloadQRCode = () => {
+    const canvas = document.getElementById("qr-code-canvas");
+    if (canvas) {
+      const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+      let downloadLink = document.createElement("a");
+      downloadLink.href = pngUrl;
+      downloadLink.download = `${title.toLowerCase().replace(/\s+/g, "_")}_QR.png`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
   };
 
   return (
@@ -150,18 +165,47 @@ function FormBuilder({ setLoggedIn }) {
           </DialogActions>
         </Dialog>
 
-        {/* STEP 2: SUCCESS DIALOG (SHOWS THE LINK) */}
+        {/* STEP 2: SUCCESS DIALOG (SHOWS LINK & QR CODE) */}
         <Dialog 
           open={Boolean(publishedUrl)} 
           onClose={() => setPublishedUrl("")}
-          PaperProps={{ sx: { borderRadius: '24px', p: 2, textAlign: 'center' } }}
+          PaperProps={{ sx: { borderRadius: '24px', p: 2, textAlign: 'center', minWidth: '350px' } }}
         >
           <DialogContent>
-            <CheckCircleOutlineIcon sx={{ fontSize: 60, color: 'success.main', mb: 2 }} />
+            <CheckCircleOutlineIcon sx={{ fontSize: 60, color: 'success.main', mb: 1 }} />
             <DialogTitle fontWeight="800" sx={{ p: 0, mb: 1 }}>Form Published!</DialogTitle>
             <DialogContentText sx={{ mb: 3 }}>
-              Your form is live and ready to accept responses. Share the link below:
+              Your form is live! Share the link or print the QR code below.
             </DialogContentText>
+
+            {/* --- NEW: QR Code Display --- */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
+              <Paper 
+                elevation={0} 
+                sx={{ 
+                  p: 2, 
+                  border: '2px dashed', 
+                  borderColor: 'divider',
+                  borderRadius: '16px',
+                  display: 'inline-block'
+                }}
+              >
+                <QRCodeCanvas 
+                  id="qr-code-canvas" 
+                  value={publishedUrl} 
+                  size={160} 
+                  level={"H"} // High error correction so it scans easily on phones
+                  includeMargin={true}
+                />
+              </Paper>
+              <Button 
+                startIcon={<DownloadIcon />} 
+                onClick={downloadQRCode} 
+                sx={{ mt: 2, textTransform: 'none', fontWeight: 600 }}
+              >
+                Download QR Code
+              </Button>
+            </Box>
             
             <TextField
               fullWidth
@@ -190,7 +234,7 @@ function FormBuilder({ setLoggedIn }) {
             <Button 
               onClick={() => navigate(`/${organization}`)} 
               variant="contained"
-              sx={{ borderRadius: '8px', px: 4 }}
+              sx={{ borderRadius: '8px', px: 4, textTransform: 'none', fontWeight: 600 }}
             >
               Return to Dashboard
             </Button>
