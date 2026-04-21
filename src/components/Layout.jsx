@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { AppBar, Toolbar, Typography, Button, Container } from "@mui/material";
+import { AppBar, Toolbar, Button, Container, Box } from "@mui/material";
+import BrandLogo from "./BrandLogo.jsx";
 
 export default function Layout({ children, userOrg, setLoggedIn }) {
   const navigate = useNavigate();
@@ -27,22 +28,13 @@ export default function Layout({ children, userOrg, setLoggedIn }) {
       >
         <Toolbar>
           
-          {/* LEFT SIDE (App Title) */}
-          <Typography
-            variant="h6"
-            sx={{ 
-              fontWeight: 'bold', 
-              color: 'primary.main', 
-              cursor: "pointer", 
-              flexGrow: 1 // This pushes the Logout button to the far right
-            }}
-            onClick={() => navigate(`/${userOrg}`)}
-          >
-            Intake Form MVP
-          </Typography>
+          {/* LEFT SIDE (App Title/Logo) */}
+          <Box sx={{ flexGrow: 1, display: 'flex' }}>
+            <BrandLogo onClick={() => navigate(`/${userOrg}`)} />
+          </Box>
 
           {/* RIGHT SIDE (Logout) */}
-          <Button color="inherit" onClick={handleLogout} sx={{ color: 'text.secondary' }}>
+          <Button color="inherit" onClick={handleLogout} sx={{ color: 'text.secondary', fontWeight: 600 }}>
             Logout
           </Button>
 

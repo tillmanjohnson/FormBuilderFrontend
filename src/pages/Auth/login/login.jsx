@@ -8,6 +8,7 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Card, SignInContainer } from '../AuthStyles.jsx'; // <-- Using the same styled components as Register for consistency
+import BrandLogo from '../../../components/BrandLogo.jsx'; // <-- Adjust path based on your folder structure
 
 
 // --- MAIN COMPONENT ---
@@ -94,18 +95,14 @@ export default function LoginForm({ setAuthView, setLoggedIn, setUserOrg }) {
       <CssBaseline enableColorScheme />
       <SignInContainer direction="column" sx={{ justifyContent: 'center' }}>
         <Card variant="outlined">
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ fontWeight: 'bold', color: 'primary.main' }}
-          >
-            Intake Form MVP
-          </Typography>
+          
+          {/* UPDATED LOGO */}
+          <BrandLogo sx={{ alignSelf: 'flex-start', mb: 1 }} />
 
           <Typography
             component="h1"
             variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', fontWeight: 600 }}
           >
             Sign in
           </Typography>
