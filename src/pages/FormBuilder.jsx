@@ -14,7 +14,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DownloadIcon from '@mui/icons-material/Download';
 import { QRCodeCanvas } from 'qrcode.react'; 
-import Layout from "../../components/Layout";
+import Layout from "../components/Layout";
 
 function FormBuilder({ setLoggedIn, organization }) {
   const navigate = useNavigate();

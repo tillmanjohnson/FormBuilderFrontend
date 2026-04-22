@@ -8,9 +8,10 @@ import LoginForm from './pages/Auth/login/login.jsx';
 import RegisterForm from './pages/Auth/register/register.jsx';
 import DefaultForm from "./Forms/DefaultForm.jsx";
 import DisplayForm from "./DisplayForm/DisplayForm.jsx";
-import FormsList from "./pages/FormsList/FormsList.jsx";
-import FormDataPage from "./pages/FormDataPage/FormDataPage.jsx";
-import FormBuilder from "./pages/FormBuilder/FormBuilder.jsx";
+import FormsList from "./pages/FormsList.jsx";
+import FormDataPage from "./pages/FormDataPage.jsx";
+import FormBuilder from "./pages/FormBuilder.jsx";
+import LandingPage from "./pages/LandingPage.jsx"; // <-- 1. IMPORT LANDING PAGE
 
 function App() {
   const [authView, setAuthView] = useState("login");
@@ -58,9 +59,21 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* LOGIN PAGE */}
+        {/* 2. NEW ROOT ROUTE: PUBLIC LANDING PAGE */}
         <Route
           path="/"
+          element={
+            loggedIn && userOrg ? (
+              <Navigate to={`/${userOrg}`} />
+            ) : (
+              <LandingPage setAuthView={setAuthView} />
+            )
+          }
+        />
+
+        {/* 3. DEDICATED LOGIN/REGISTER ROUTE */}
+        <Route
+          path="/login"
           element={
             loggedIn && userOrg ? (
               <Navigate to={`/${userOrg}`} />
@@ -82,13 +95,12 @@ function App() {
         <Route
           path="/:orgName"
           element={
-            loggedIn ? <FormsList setLoggedIn={setLoggedIn} /> : <Navigate to="/" />
+            loggedIn ? <FormsList setLoggedIn={setLoggedIn} /> : <Navigate to="/login" />
           }
         />
 
         {/* DEV FORM */}
         <Route path="/dev-form" element={<DefaultForm />} />
-        <Route path="/display-form" element={<DisplayForm />} />
         
         {/* PROTECTED FORM BUILDER */}
         <Route 
@@ -97,19 +109,19 @@ function App() {
             loggedIn && userOrg ? (
               <FormBuilder setLoggedIn={setLoggedIn} organization={userOrg} />
             ) : (
-              <Navigate to="/" replace />
+              <Navigate to="/login" replace />
             )
           } 
         />
 
-        {/* no log in form i hope */}
+        {/* PUBLIC FORM RESPONDER */}
         <Route path="/form/:formId" element={<DisplayForm />} />
 
         {/* INDIVIDUAL FORM DATA PAGE */}
         <Route
           path="/:orgName/:formId"
           element={
-            loggedIn ? <FormDataPage setLoggedIn={setLoggedIn} /> : <Navigate to="/" />
+            loggedIn ? <FormDataPage setLoggedIn={setLoggedIn} /> : <Navigate to="/login" />
           }
         />
 
