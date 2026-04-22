@@ -20,13 +20,15 @@ function FormBuilder({ setLoggedIn, organization }) {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [fields, setFields] = useState([{ id: "", label: "", type: "text", required: false }]);
+  
+  // Notice we added a default 'options' array to the base state
+  const [fields, setFields] = useState([{ id: "", label: "", type: "text", required: false, options: [] }]);
   
   // Modal States
   const [openConfirm, setOpenConfirm] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState(""); 
 
-  const addField = () => setFields([...fields, { id: "", label: "", type: "text", required: false }]);
+  const addField = () => setFields([...fields, { id: "", label: "", type: "text", required: false, options: [] }]);
 
   const removeField = (index) => {
     const updated = [...fields];
@@ -37,8 +39,35 @@ function FormBuilder({ setLoggedIn, organization }) {
   const handleFieldChange = (index, key, value) => {
     const updated = [...fields];
     updated[index][key] = value;
+    
+    // If they change the type away from select/radio, we can clear the options to keep data clean
+    if (key === "type" && value !== "select" && value !== "radio") {
+      updated[index].options = [];
+    }
+    
     setFields(updated);
   };
+
+  // --- NEW: Option Handlers ---
+  const addOption = (fieldIndex) => {
+    const updated = [...fields];
+    if (!updated[fieldIndex].options) updated[fieldIndex].options = [];
+    updated[fieldIndex].options.push(`Option ${updated[fieldIndex].options.length + 1}`);
+    setFields(updated);
+  };
+
+  const removeOption = (fieldIndex, optionIndex) => {
+    const updated = [...fields];
+    updated[fieldIndex].options.splice(optionIndex, 1);
+    setFields(updated);
+  };
+
+  const handleOptionChange = (fieldIndex, optionIndex, value) => {
+    const updated = [...fields];
+    updated[fieldIndex].options[optionIndex] = value;
+    setFields(updated);
+  };
+  // ----------------------------
 
   const handleRequestPublish = (e) => {
     e.preventDefault();
@@ -81,7 +110,7 @@ function FormBuilder({ setLoggedIn, organization }) {
       // Reset the form in the background
       setTitle(""); 
       setDescription("");
-      setFields([{ id: "", label: "", type: "text", required: false }]);
+      setFields([{ id: "", label: "", type: "text", required: false, options: [] }]);
       
     } catch (err) {
       // This will now display the clean error message from our Flask backend
@@ -119,7 +148,7 @@ function FormBuilder({ setLoggedIn, organization }) {
         </Box>
         
         <form onSubmit={handleRequestPublish}>
-          <Paper sx={{ p: 3, mb: 4, borderRadius: '16px', border: '1px solid #eee', boxShadow: '0px 4px 20px rgba(0,0,0,0.05)' }}>
+          <Paper sx={{ p: 3, mb: 4, borderRadius: '16px', border: '1px solid', borderColor: 'divider', boxShadow: '0px 4px 20px rgba(0,0,0,0.05)' }}>
             <Typography variant="h6" mb={2} fontWeight="600">Form Details</Typography>
             <Stack spacing={3}>
               <TextField label="Form Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Patient Intake" />
@@ -129,7 +158,7 @@ function FormBuilder({ setLoggedIn, organization }) {
 
           <Typography variant="h6" mb={2} fontWeight="600">Form Questions</Typography>
           {fields.map((field, index) => (
-            <Paper key={index} sx={{ p: 3, mb: 2, borderRadius: '12px', border: '1px solid #eee' }}>
+            <Paper key={index} sx={{ p: 3, mb: 2, borderRadius: '12px', border: '1px solid', borderColor: 'divider' }}>
               <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
                 <Typography color="primary" fontWeight="bold">Question #{index + 1}</Typography>
                 <IconButton color="error" onClick={() => removeField(index)} size="small"><DeleteOutlineIcon /></IconButton>
@@ -171,6 +200,33 @@ function FormBuilder({ setLoggedIn, organization }) {
                   label="Required Field" 
                 />
               </Box>
+
+              {/* NEW: Options Builder for Select & Radio types */}
+              {(field.type === "select" || field.type === "radio") && (
+                <Box sx={{ mt: 3, p: 2, bgcolor: 'background.default', borderRadius: '8px', border: '1px dashed', borderColor: 'divider' }}>
+                  <Typography variant="subtitle2" fontWeight="bold" mb={2} color="text.secondary">
+                    Configure Options
+                  </Typography>
+                  {(field.options || []).map((opt, optIdx) => (
+                    <Box key={optIdx} display="flex" alignItems="center" gap={1} mb={1.5}>
+                      <TextField
+                        size="small"
+                        value={opt}
+                        onChange={(e) => handleOptionChange(index, optIdx, e.target.value)}
+                        placeholder={`Option ${optIdx + 1}`}
+                        fullWidth
+                        required
+                      />
+                      <IconButton color="error" size="small" onClick={() => removeOption(index, optIdx)}>
+                        <DeleteOutlineIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  ))}
+                  <Button size="small" startIcon={<AddIcon />} onClick={() => addOption(index)} sx={{ textTransform: 'none', mt: 1 }}>
+                    Add Option
+                  </Button>
+                </Box>
+              )}
             </Paper>
           ))}
 
@@ -180,7 +236,7 @@ function FormBuilder({ setLoggedIn, organization }) {
           </Stack>
         </form>
 
-        {/* STEP 1: CONFIRMATION DIALOG */}
+        {/* DIALOGS REMAIN EXACTLY THE SAME... */}
         <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)} PaperProps={{ sx: { borderRadius: '16px', p: 1 } }}>
           <DialogTitle fontWeight="700">Publish Form?</DialogTitle>
           <DialogContent>
@@ -192,7 +248,7 @@ function FormBuilder({ setLoggedIn, organization }) {
           </DialogActions>
         </Dialog>
 
-        {/* STEP 2: SUCCESS DIALOG (SHOWS LINK & QR CODE) */}
+        {/* SUCCESS DIALOG (SHOWS LINK & QR CODE) */}
         <Dialog 
           open={Boolean(publishedUrl)} 
           onClose={() => setPublishedUrl("")}

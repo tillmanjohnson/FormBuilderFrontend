@@ -27,7 +27,6 @@ function DisplayForm() {
   const [error, setError] = useState(null);
   const { formId } = useParams();
 
-  // --- NEW STATE VARIABLES ---
   const [openConfirm, setOpenConfirm] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionPayload, setSubmissionPayload] = useState(null);
@@ -195,25 +194,27 @@ function DisplayForm() {
                             defaultValue=""
                             required={field.required}
                           >
-                            {field.options.map((opt) => (
-                              <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                            {/* FIX: Map over simple strings and use optional chaining */}
+                            {field.options?.map((opt, index) => (
+                              <MenuItem key={index} value={opt}>{opt}</MenuItem>
                             ))}
                           </TextField>
                         );
 
                       case "radio":
                         return (
-                          <FormControl key={field.id} component="fieldset">
+                          <FormControl key={field.id} component="fieldset" required={field.required}>
                             <FormLabel sx={{ mb: 1, fontWeight: 600, fontSize: '0.9rem' }}>
                               {field.label}
                             </FormLabel> 
                             <RadioGroup row name={field.id}>
-                              {field.options.map((opt) => (
+                              {/* FIX: Map over simple strings and use optional chaining */}
+                              {field.options?.map((opt, index) => (
                                 <FormControlLabel 
-                                  key={opt.value} 
-                                  value={opt.value} 
+                                  key={index} 
+                                  value={opt} 
                                   control={<Radio />} 
-                                  label={opt.label} 
+                                  label={opt} 
                                 />
                               ))}
                             </RadioGroup>
