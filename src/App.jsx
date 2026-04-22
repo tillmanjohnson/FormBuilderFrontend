@@ -89,7 +89,18 @@ function App() {
         {/* DEV FORM */}
         <Route path="/dev-form" element={<DefaultForm />} />
         <Route path="/display-form" element={<DisplayForm />} />
-        <Route path="/form-builder" element={<FormBuilder />} />
+        
+        {/* PROTECTED FORM BUILDER */}
+        <Route 
+          path="/form-builder" 
+          element={
+            loggedIn && userOrg ? (
+              <FormBuilder setLoggedIn={setLoggedIn} organization={userOrg} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          } 
+        />
 
         {/* no log in form i hope */}
         <Route path="/form/:formId" element={<DisplayForm />} />

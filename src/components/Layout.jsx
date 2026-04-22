@@ -12,6 +12,7 @@ export default function Layout({ children, userOrg, setLoggedIn }) {
     }).then(() => {
       localStorage.removeItem("token"); 
       setLoggedIn(false);
+      navigate("/"); // <-- This line kicks them immediately back to login.
     });
   };
 
