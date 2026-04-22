@@ -161,8 +161,8 @@ function FormBuilder({ setLoggedIn, organization }) {
                   <MenuItem value="number">Number</MenuItem>
                   <MenuItem value="date">Date</MenuItem>
                   <MenuItem value="textarea">Long Text</MenuItem>
-                  <MenuItem value="select">Dropdown</MenuItem>
-                  <MenuItem value="radio">Multiple Choice</MenuItem>
+                 {/* <MenuItem value="select">Dropdown</MenuItem>
+                  <MenuItem value="radio">Multiple Choice</MenuItem> couldnt get it working :/*/} 
                 </TextField>
                 
                 <FormControlLabel 
