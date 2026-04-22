@@ -1,11 +1,12 @@
-//a dynamic page that allows a simple (for now) series of questions to be inputed and packages into a json 'builtform'
+//a dynamic page that allows a simple (for now hehehe) series of questions to be inputed and packages into a json 'builtform'
 import { useState } from "react";
 
 function FormBuilder() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [organization, setOrganization] = useState("Smiles");
-
+  // const { orgName } = useParams(); 
+  //
   const [fields, setFields] = useState([
     {
       id: "",
@@ -40,7 +41,7 @@ function FormBuilder() {
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+//add logic to prevent duplicates 
     const formId = `form_${organization}_${title
       .toLowerCase()
       .replace(/\s+/g, "_")}`;
