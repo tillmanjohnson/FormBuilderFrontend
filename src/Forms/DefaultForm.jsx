@@ -1,3 +1,10 @@
+// Is this file obsolete? 
+
+// It seems to be a simple form component that submits data to the backend.
+// If it's not being used anywhere, we might consider removing it to keep the codebase clean. However, if it's intended for future use or as a template, we can keep it for now.
+// Let's check if it's being imported or used in any other part of the application before deleting it. Apr 14th
+
+
 import { useState } from "react";
 
 export default function FormComponent() {
@@ -28,7 +35,7 @@ export default function FormComponent() {
       answers: answers
     };
 
-    const res = await fetch("http://127.0.0.1:5000/submit-form", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/submit-form`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

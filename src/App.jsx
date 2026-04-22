@@ -4,12 +4,12 @@ import { CircularProgress, Box, Container, Typography } from "@mui/material";
 
 import './App.css';
 
-import LoginForm from './login/login.jsx';
-import RegisterForm from './register/register.jsx';
+import LoginForm from './pages/Auth/login/login.jsx';
+import RegisterForm from './pages/Auth/register/register.jsx';
 import DefaultForm from "./Forms/DefaultForm.jsx";
 import DisplayForm from "./DisplayForm/DisplayForm.jsx";
-import FormsList from "./pages/formslist/formslist.jsx";
-import FormDataPage from "./pages/formdatapage/formdatapage.jsx";
+import FormsList from "./pages/FormsList/FormsList.jsx";
+import FormDataPage from "./pages/FormDataPage/FormDataPage.jsx";
 import FormBuilder from "./pages/FormBuilder/FormBuilder.jsx";
 
 function App() {
@@ -17,13 +17,18 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(null);
   const [userOrg, setUserOrg] = useState(null); // <- store user's organization
 
+  console.log("My API URL is:", import.meta.env.VITE_API_URL);
+
   // Check authentication and get organization
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch("http://localhost:5000/check-auth", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/check-auth`, {
           method: "GET",
           credentials: "include",
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}` 
+          },
         });
 
         if (res.ok) {
@@ -60,24 +65,15 @@ function App() {
             loggedIn && userOrg ? (
               <Navigate to={`/${userOrg}`} />
             ) : (
-              <Container maxWidth="sm">
-                <Box mt={8} textAlign="center">
-                  <Typography variant="h4" gutterBottom>
-                    Intake Form MVP
-                  </Typography>
-
-                  {authView === "login" ? (
-                    <LoginForm
-                      setAuthView={setAuthView}
-                      setLoggedIn={setLoggedIn}
-                      setUserOrg={setUserOrg} // <- pass setter to LoginForm
-                    />
-                  ) : (
-                    <RegisterForm setAuthView={setAuthView} />
-                  )}
-
-                </Box>
-              </Container>
+              authView === "login" ? (
+                <LoginForm
+                  setAuthView={setAuthView}
+                  setLoggedIn={setLoggedIn}
+                  setUserOrg={setUserOrg}
+                />
+              ) : (
+                <RegisterForm setAuthView={setAuthView} />
+              )
             )
           }
         />
@@ -93,7 +89,18 @@ function App() {
         {/* DEV FORM */}
         <Route path="/dev-form" element={<DefaultForm />} />
         <Route path="/display-form" element={<DisplayForm />} />
-        <Route path="/form-builder" element={<FormBuilder />} />
+        
+        {/* PROTECTED FORM BUILDER */}
+        <Route 
+          path="/form-builder" 
+          element={
+            loggedIn && userOrg ? (
+              <FormBuilder setLoggedIn={setLoggedIn} organization={userOrg} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          } 
+        />
 
         {/* no log in form i hope */}
         <Route path="/form/:formId" element={<DisplayForm />} />

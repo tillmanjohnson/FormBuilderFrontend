@@ -1,52 +1,48 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { AppBar, Toolbar, Typography, Button, Container } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
+import { useNavigate } from "react-router-dom";
+import { AppBar, Toolbar, Button, Container, Box } from "@mui/material";
+import BrandLogo from "./BrandLogo.jsx";
 
 export default function Layout({ children, userOrg, setLoggedIn }) {
   const navigate = useNavigate();
-  const location = useLocation();
-  const isFormPage = location.pathname.split("/").length > 2;
 
   const handleLogout = () => {
-    fetch("http://localhost:5000/logout", {
+    fetch(`${import.meta.env.VITE_API_URL}/logout`, {
       method: "POST",
       credentials: "include",
-    }).then(() => setLoggedIn(false));
+    }).then(() => {
+      localStorage.removeItem("token"); 
+      setLoggedIn(false);
+      navigate("/"); // <-- This line kicks them immediately back to login.
+    });
   };
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar 
+        position="sticky" 
+        elevation={0} 
+        sx={{ 
+          bgcolor: 'background.paper', 
+          borderBottom: '1px solid', 
+          borderColor: 'divider' 
+        }}
+      >
         <Toolbar>
-            
-            {/* Back button (only show on form pages) */}
-            {isFormPage && (
-                <Button
-                    color="inherit"
-                    startIcon={<ArrowBackIcon />}
-                    onClick={() => navigate(`/${userOrg}`)}
-                    sx={{ mr: 2 }}
-                >
-                    Back
-                </Button>
-            )}
+          
+          {/* LEFT SIDE (App Title/Logo) */}
+          <Box sx={{ flexGrow: 1, display: 'flex' }}>
+            <BrandLogo onClick={() => navigate(`/${userOrg}`)} />
+          </Box>
 
-          <Typography
-            variant="h6"
-            sx={{ flexGrow: 1, cursor: "pointer" }}
-            onClick={() => navigate(`/${userOrg}`)}
-          >
-            Intake Form MVP
-          </Typography>
-
-          <Button color="inherit" onClick={handleLogout}>
+          {/* RIGHT SIDE (Logout) */}
+          <Button color="inherit" onClick={handleLogout} sx={{ color: 'text.secondary', fontWeight: 600 }}>
             Logout
           </Button>
+
         </Toolbar>
       </AppBar>
 
-      <Container sx={{ marginTop: 4 }}>
+      <Container maxWidth="lg" sx={{ marginTop: 4, marginBottom: 6 }}>
         {children}
       </Container>
     </>
