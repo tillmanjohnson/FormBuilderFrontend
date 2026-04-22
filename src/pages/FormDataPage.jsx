@@ -19,7 +19,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode'; // <-- NEW IMPORT
 import DownloadIcon from '@mui/icons-material/Download'; // <-- NEW IMPORT
 import { QRCodeCanvas } from 'qrcode.react'; // <-- NEW IMPORT
 
-import Layout from "../../components/Layout";
+import Layout from "../components/Layout";
 
 
 export default function FormDataPage({ setLoggedIn }) {
