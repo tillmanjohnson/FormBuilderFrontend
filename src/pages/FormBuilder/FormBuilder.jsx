@@ -13,14 +13,13 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DownloadIcon from '@mui/icons-material/Download';
-import { QRCodeCanvas } from 'qrcode.react'; // <-- NEW IMPORT
+import { QRCodeCanvas } from 'qrcode.react'; 
 import Layout from "../../components/Layout";
 
-function FormBuilder({ setLoggedIn }) {
+function FormBuilder({ setLoggedIn, organization }) {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [organization, setOrganization] = useState("Smiles");
   const [fields, setFields] = useState([{ id: "", label: "", type: "text", required: false }]);
   
   // Modal States
@@ -63,13 +62,17 @@ function FormBuilder({ setLoggedIn }) {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/built-forms`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", 
         body: JSON.stringify(payload),
       });
       
-      if (!res.ok) throw new Error(await res.text());
+      // --- NEW: Parse JSON error properly ---
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to publish form.");
+      }
 
       // Generate the URL based on your routing structure
-      // e.g., http://localhost:5173/form/form_Smiles_intake
       const generatedUrl = `${window.location.origin}/form/${formId}`;
       
       setPublishedUrl(generatedUrl);
@@ -81,8 +84,9 @@ function FormBuilder({ setLoggedIn }) {
       setFields([{ id: "", label: "", type: "text", required: false }]);
       
     } catch (err) {
-      alert("Error creating form: " + err.message);
-      setOpenConfirm(false);
+      // This will now display the clean error message from our Flask backend
+      alert(err.message);
+      setOpenConfirm(false); 
     }
   };
 
@@ -90,7 +94,7 @@ function FormBuilder({ setLoggedIn }) {
     navigator.clipboard.writeText(publishedUrl);
   };
 
-  // --- NEW: Function to download the QR code as a PNG ---
+  // Function to download the QR code as a PNG
   const downloadQRCode = () => {
     const canvas = document.getElementById("qr-code-canvas");
     if (canvas) {
@@ -105,7 +109,7 @@ function FormBuilder({ setLoggedIn }) {
   };
 
   return (
-    <Layout setLoggedIn={setLoggedIn}>
+    <Layout setLoggedIn={setLoggedIn} userOrg={organization}>
       <Box maxWidth="800px" mx="auto" pb={6}>
         <Box sx={{ display: "flex", alignItems: "center", mb: 3, position: "relative" }}>
           <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ color: 'text.secondary', textTransform: 'none', position: 'absolute', left: { xs: 0, md: -100 } }}>
@@ -131,8 +135,26 @@ function FormBuilder({ setLoggedIn }) {
                 <IconButton color="error" onClick={() => removeField(index)} size="small"><DeleteOutlineIcon /></IconButton>
               </Box>
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                <TextField label="Field ID" size="small" value={field.id} onChange={(e) => handleFieldChange(index, "id", e.target.value)} required />
-                <TextField label="Display Label" size="small" value={field.label} onChange={(e) => handleFieldChange(index, "label", e.target.value)} required />
+                <TextField 
+                  label="Data Column Header (Internal)" 
+                  size="small" 
+                  placeholder="e.g., patient_first_name"
+                  helperText="What you'll see at the top of the data table."
+                  value={field.id} 
+                  onChange={(e) => handleFieldChange(index, "id", e.target.value)} 
+                  required 
+                />
+                
+                <TextField 
+                  label="Question Text (Public)" 
+                  size="small" 
+                  placeholder="e.g., What is your first name?"
+                  helperText="The actual question people will see on the form."
+                  value={field.label} 
+                  onChange={(e) => handleFieldChange(index, "label", e.target.value)} 
+                  required 
+                />
+                
                 <TextField select label="Input Type" size="small" value={field.type} onChange={(e) => handleFieldChange(index, "type", e.target.value)}>
                   <MenuItem value="text">Short Text</MenuItem>
                   <MenuItem value="email">Email</MenuItem>
@@ -142,7 +164,12 @@ function FormBuilder({ setLoggedIn }) {
                   <MenuItem value="select">Dropdown</MenuItem>
                   <MenuItem value="radio">Multiple Choice</MenuItem>
                 </TextField>
-                <FormControlLabel control={<Checkbox checked={field.required} onChange={(e) => handleFieldChange(index, "required", e.target.checked)} />} label="Required Field" />
+                
+                <FormControlLabel 
+                  sx={{ alignSelf: 'flex-start', mt: 1 }}
+                  control={<Checkbox checked={field.required} onChange={(e) => handleFieldChange(index, "required", e.target.checked)} />} 
+                  label="Required Field" 
+                />
               </Box>
             </Paper>
           ))}
@@ -178,17 +205,11 @@ function FormBuilder({ setLoggedIn }) {
               Your form is live! Share the link or print the QR code below.
             </DialogContentText>
 
-            {/* --- NEW: QR Code Display --- */}
+            {/* QR Code Display */}
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
               <Paper 
                 elevation={0} 
-                sx={{ 
-                  p: 2, 
-                  border: '2px dashed', 
-                  borderColor: 'divider',
-                  borderRadius: '16px',
-                  display: 'inline-block'
-                }}
+                sx={{ p: 2, border: '2px dashed', borderColor: 'divider', borderRadius: '16px', display: 'inline-block' }}
               >
                 <QRCodeCanvas 
                   id="qr-code-canvas" 
@@ -222,11 +243,7 @@ function FormBuilder({ setLoggedIn }) {
                     </Tooltip>
                   </InputAdornment>
                 ),
-                sx: {
-                  borderRadius: '12px',
-                  bgcolor: 'action.hover',
-                  color: 'text.secondary',
-                }
+                sx: { borderRadius: '12px', bgcolor: 'action.hover', color: 'text.secondary' }
               }}
             />
           </DialogContent>
