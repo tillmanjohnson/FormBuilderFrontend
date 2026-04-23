@@ -172,13 +172,19 @@ function DisplayForm() {
                         return (
                           <TextField
                             key={field.id}
-                            fullWidth
-                            multiline
-                            rows={4}
-                            label={field.label}
                             id={field.id}
                             name={field.id}
+                            label={field.label}
                             required={field.required}
+                            fullWidth
+                            multiline
+                            minRows={4} // Changed from rows={4}
+                            variant="outlined"
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                alignItems: 'flex-start',
+                              },
+                            }}
                           />
                         );
 

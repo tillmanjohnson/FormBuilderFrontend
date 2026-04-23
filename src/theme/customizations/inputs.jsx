@@ -10,6 +10,24 @@ import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
 import { gray, brand } from '../themePrimitives.js';
 
 export const inputsCustomizations = {
+  MuiInputLabel: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        // This centers the label vertically inside your custom-height box 
+        // before the user clicks on it
+        transform: 'translate(12px, 10px) scale(1)', 
+        zIndex: 1,
+        pointerEvents: 'none',
+      }),
+      shrink: ({ theme }) => ({
+        // This controls where the label goes when it "rises"
+        // The second value (-18px) is what lifts it above the border
+        transform: 'translate(12px, -18px) scale(0.75) !important',
+        fontWeight: 600,
+        padding: '0 4px', // Adds a tiny bit of space around the text
+      }),
+    },
+  },
   MuiButtonBase: {
     defaultProps: {
       disableTouchRipple: true,
@@ -362,6 +380,14 @@ export const inputsCustomizations = {
         border: `1px solid ${(theme.vars || theme).palette.divider}`,
         backgroundColor: (theme.vars || theme).palette.background.default,
         transition: 'border 120ms ease-in',
+        overflow: 'visible', // Ensure the label doesn't get cut off by the overflow of the box
+        
+        // This ensures multiline boxes can grow and don't stay 40px tall
+        '&.MuiInputBase-multiline': {
+          height: 'auto', 
+          minHeight: '100px', // This ensures it looks like a "Long Text" box immediately
+        },
+
         '&:hover': {
           borderColor: gray[400],
         },
@@ -380,7 +406,9 @@ export const inputsCustomizations = {
               size: 'small',
             },
             style: {
-              height: '2.25rem',
+              // Could change 'height' to 'minHeight' or keep height but the 
+              // .MuiInputBase-multiline rule above will override it
+              height: '2.25rem', 
             },
           },
           {
