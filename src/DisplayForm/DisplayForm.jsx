@@ -85,7 +85,10 @@ function DisplayForm() {
       });
       if (!res.ok) throw new Error("Failed to submit form");
       
-      // Success! Close the dialog and change the UI to the "Thank You" dead end.
+      // Success! Change the UI to the "Thank You" dead end.
+
+      window.scrollTo({ top: 0, behavior: 'instant' }); // Reset the scroll position instantly so they land at the top of the page
+      
       setOpenConfirm(false);
       setIsSubmitted(true);
     } catch (err) {
@@ -110,23 +113,33 @@ function DisplayForm() {
     <Box sx={{ 
       minHeight: '100vh', 
       bgcolor: 'background.default', 
-      py: { xs: 4, md: 8 }, 
-      px: 2 
+      py: isSubmitted ? { xs: 0, md: 8 } : { xs: 4, md: 8 }, // Reduce vertical padding on mobile when submitted
+      px: 2,
+      // If submitted, make this Box a full-height centering container
+      display: isSubmitted ? 'flex' : 'block',
+      justifyContent: isSubmitted ? 'center' : 'initial',
+      alignItems: isSubmitted ? 'center' : 'initial',
     }}>
       <Container maxWidth="sm">
         <Paper 
           elevation={4} 
           sx={{ 
-            p: { xs: 3, md: 5 }, 
+            p: { xs: 3, md: 5 },
             borderRadius: '24px', 
             border: 1, 
             borderColor: 'divider', 
-            bgcolor: 'background.paper' 
+            bgcolor: 'background.paper',
+            // Ensure content inside centered Paper is also centered
+            display: isSubmitted ? 'flex' : 'block',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            minHeight: isSubmitted ? 'auto' : 'initial',
           }}
         >
           {/* CONDITIONAL RENDERING: Show "Dead End" if submitted, otherwise show the form */}
           {isSubmitted ? (
-            <Box textAlign="center" py={6}>
+            // Increase vertical padding inside the box to make it feel more "screen filling" on mobile
+            <Box textAlign="center" py={{ xs: 8, md: 6 }}> 
               <Typography variant="h5" fontWeight="700" color="text.primary" gutterBottom>
                 Thank You!
               </Typography>
@@ -149,72 +162,99 @@ function DisplayForm() {
               <form onSubmit={handleRequestSubmit}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.5 }}>
                   {selectedForm.fields.map((field) => {
+                    
+                    // Decide if the text is too long to float
+                    // 45 characters is usually the safe limit for mobile screens. Thinking about making this dynamic based on screen size, but for now we'll just use a fixed threshold
+                    // 40 seems to be a better fit keeping more narrow screens in mind
+                    const isLongQuestion = field.label?.length > 40;
+
+                    // PERMANENT LABEL: This renders above the box ONLY if it's a long question
+                    const PermanentLabel = () => isLongQuestion ? (
+                      <Typography 
+                        variant="body2" 
+                        fontWeight="600" 
+                        color="text.primary"
+                        sx={{ mb: 1, lineHeight: 1.4 }}
+                      >
+                        {field.label} {field.required && " *"}
+                      </Typography>
+                    ) : null;
+
                     switch (field.type) {
                       case "text":
                       case "email":
                       case "date":
                       case "number":
                         return (
-                          <TextField
-                            key={field.id}
-                            fullWidth
-                            label={field.label}
-                            type={field.type}
-                            id={field.id}
-                            name={field.id}
-                            required={field.required}
-                            variant="outlined"
-                            InputLabelProps={field.type === 'date' ? { shrink: true } : {}}
-                          />
+                          <Box key={field.id} sx={{ width: '100%' }}>
+                            <PermanentLabel />
+                            <TextField
+                              fullWidth
+                              // If it's a long question, kills the floating label. Otherwise, uses it
+                              label={isLongQuestion ? null : field.label}
+                              // Grey prompt inside input box if the label is floating outside
+                              placeholder={isLongQuestion ? "Your answer here..." : ""}
+                              type={field.type}
+                              id={field.id}
+                              name={field.id}
+                              required={field.required && !isLongQuestion} // Prevents double asterisks
+                              variant="outlined"
+                              InputLabelProps={field.type === 'date' ? { shrink: true } : {}}
+                            />
+                          </Box>
                         );
 
                       case "textarea":
                         return (
-                          <TextField
-                            key={field.id}
-                            id={field.id}
-                            name={field.id}
-                            label={field.label}
-                            required={field.required}
-                            fullWidth
-                            multiline
-                            minRows={4} // Changed from rows={4}
-                            variant="outlined"
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                alignItems: 'flex-start',
-                              },
-                            }}
-                          />
+                          <Box key={field.id} sx={{ width: '100%' }}>
+                            <PermanentLabel />
+                            <TextField
+                              id={field.id}
+                              name={field.id}
+                              label={isLongQuestion ? null : field.label}
+                              placeholder={isLongQuestion ? "Type your answer here..." : ""}
+                              required={field.required && !isLongQuestion}
+                              fullWidth
+                              multiline
+                              minRows={4}
+                              variant="outlined"
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  alignItems: 'flex-start',
+                                },
+                              }}
+                            />
+                          </Box>
                         );
 
                       case "select":
                         return (
-                          <TextField
-                            key={field.id}
-                            select
-                            fullWidth
-                            label={field.label}
-                            id={field.id}
-                            name={field.id}
-                            defaultValue=""
-                            required={field.required}
-                          >
-                            {/* FIX: Map over simple strings and use optional chaining */}
-                            {field.options?.map((opt, index) => (
-                              <MenuItem key={index} value={opt}>{opt}</MenuItem>
-                            ))}
-                          </TextField>
+                          <Box key={field.id} sx={{ width: '100%' }}>
+                            <PermanentLabel />
+                            <TextField
+                              select
+                              fullWidth
+                              label={isLongQuestion ? null : field.label}
+                              id={field.id}
+                              name={field.id}
+                              defaultValue=""
+                              required={field.required && !isLongQuestion}
+                            >
+                              {field.options?.map((opt, index) => (
+                                <MenuItem key={index} value={opt}>{opt}</MenuItem>
+                              ))}
+                            </TextField>
+                          </Box>
                         );
 
                       case "radio":
                         return (
                           <FormControl key={field.id} component="fieldset" required={field.required}>
-                            <FormLabel sx={{ mb: 1, fontWeight: 600, fontSize: '0.9rem' }}>
+                            {/* Radio buttons never had a floating label, we have always just used a standard label for them */}
+                            <FormLabel sx={{ mb: 1, fontWeight: 600, fontSize: '0.9rem', color: 'text.primary' }}>
                               {field.label}
                             </FormLabel> 
                             <RadioGroup row name={field.id}>
-                              {/* FIX: Map over simple strings and use optional chaining */}
                               {field.options?.map((opt, index) => (
                                 <FormControlLabel 
                                   key={index} 
