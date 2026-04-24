@@ -7,7 +7,7 @@ import {
 } from "@mui/x-data-grid";
 import { 
   Typography, Box, Button, IconButton, Tooltip,
-  Paper, Dialog, DialogTitle, DialogContent, DialogActions // <-- NEW IMPORTS
+  Paper, Dialog, DialogTitle, DialogContent, DialogActions
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -15,9 +15,9 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
-import QrCodeIcon from '@mui/icons-material/QrCode'; // <-- NEW IMPORT
-import DownloadIcon from '@mui/icons-material/Download'; // <-- NEW IMPORT
-import { QRCodeCanvas } from 'qrcode.react'; // <-- NEW IMPORT
+import QrCodeIcon from '@mui/icons-material/QrCode';
+import DownloadIcon from '@mui/icons-material/Download';
+import { QRCodeCanvas } from 'qrcode.react';
 
 import Layout from "../components/Layout";
 
@@ -135,6 +135,7 @@ export default function FormDataPage({ setLoggedIn }) {
   useEffect(() => {
     async function fetchData() {
       try {
+        // 1. Auth Check
         const authRes = await fetch(`${import.meta.env.VITE_API_URL}/check-auth`, {
           credentials: "include",
           headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
@@ -148,6 +149,7 @@ export default function FormDataPage({ setLoggedIn }) {
           return;
         }
 
+        // 2. Fetch Form Submissions
         const res = await fetch(`${import.meta.env.VITE_API_URL}/form-submissions`, {
           credentials: "include",
           headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
@@ -155,22 +157,59 @@ export default function FormDataPage({ setLoggedIn }) {
         const data = await res.json();
         const filtered = data.filter((f) => f.formId === formId);
 
-        const allKeys = [];
+        // 3. Fetch Form Definition (We moved this up so we can use it to order the columns)
+        const formsRes = await fetch(`${import.meta.env.VITE_API_URL}/built-forms-list`, {
+          credentials: "include",
+          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
+        });
+        const formsData = await formsRes.json();
+        const match = formsData.find((f) => f.id === formId);
+
+        if (match) {
+          setTitle(match.title);
+          setFormUrl(`${window.location.origin}/form/${formId}`);
+        } else {
+          setTitle("Form not found");
+        }
+
+        // 4. Build an ordered array of keys based on the actual Form Builder
+        const orderedKeys = match?.fields ? match.fields.map(field => field.id) : [];
+
+        // 5. Gather any extra keys from submissions (in case you delete a question later, but old data still has it)
+        const submissionKeys = new Set();
         filtered.forEach((submission) => {
-          Object.keys(submission.responses || {}).forEach((key) => {
-            if (!allKeys.includes(key)) allKeys.push(key);
-          });
+          Object.keys(submission.responses || {}).forEach((key) => submissionKeys.add(key));
         });
 
-        const cols = allKeys.map((key) => ({
-          field: key,
-          headerName: key,
-          minWidth: 150, // Minimum they can shrink to
-          flex: 1,       // They will grow to fill the 900px container
-          editable: true,
-        }));
+        // 6. Merge them: Form questions first (in perfect order), then any leftover legacy/deleted questions
+        const finalKeys = [];
+        orderedKeys.forEach(key => {
+          finalKeys.push(key);
+          submissionKeys.delete(key);
+        });
+        submissionKeys.forEach(key => finalKeys.push(key));
+
+        // 7. Create the ordered columns
+        const cols = finalKeys.map((key) => {
+          // Define what is considered a "long" header (e.g., more than 15 characters)
+          const isLongHeader = key.length > 15;
+          
+          // Calculate an approximate pixel width: 
+          // ~9 pixels per character + 40 pixels of padding for the sort icon and margins
+          const dynamicWidth = (key.length * 9) + 40;
+
+          return {
+            field: key,
+            headerName: key,
+            width: isLongHeader ? dynamicWidth : undefined, // If long, apply the dynamic width. If short, leave it undefined so flex takes over.
+            minWidth: 150, // Minimum they can shrink to
+            flex: isLongHeader ? 0 : 1, // If long, disable flex. If short, let it stretch to fill empty space evenly.
+            editable: true,
+          };
+        });
         setColumns(cols);
 
+        // 8. Generate the rows
         const generatedRows = filtered.map((s) => {
           const row = { id: s._id };
           Object.keys(s.responses || {}).forEach((key) => {
@@ -180,18 +219,6 @@ export default function FormDataPage({ setLoggedIn }) {
         });
         setRows(generatedRows);
 
-        const formsRes = await fetch(`${import.meta.env.VITE_API_URL}/built-forms-list`, {
-          credentials: "include",
-          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
-        });
-        const formsData = await formsRes.json();
-        const match = formsData.find((f) => f.id === formId);
-        if (match) {
-          setTitle(match.title);
-          setFormUrl(`${window.location.origin}/form/${formId}`);
-        } else {
-          setTitle("Form not found");
-        }
       } catch (err) {
         console.error(err);
         setTitle("Error loading title"); // Added fallback in case of fetch error
